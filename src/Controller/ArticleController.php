@@ -9,11 +9,21 @@ use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleController extends AbstractController
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
     /**
      * @Route("/", name="app_homepage")
      */
@@ -44,5 +54,19 @@ class ArticleController extends AbstractController
             'article' => $article,
             'comments' => $comments
         ]);
+    }
+
+    /**
+     * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"})
+     * @param Article $article
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
+    public function toggleArticleHeart(Article $article): JsonResponse
+    {
+        $article->incrementHeartCount();
+        $this->em->flush();
+
+        return new JsonResponse(['hearts' => $article->getHeartCount()]);
     }
 }
