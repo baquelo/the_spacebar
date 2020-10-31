@@ -4,7 +4,16 @@
     <h1>Home Page</h1>
 
     <div>
-        <a href="{{ path('app_article_show', { slug: 'my-article' }) }}">My article</a>
+        {% for article in articles %}
+            <ul>
+                <li>
+                    <img src="{{ asset(article.imagePath) }}" width="150px" alt="">
+                    <a href="{{ path('app_article_show', { slug: article.slug }) }}">{{ article.title }}</a>
+                    <div>Published At: {{ article.publishedAt|ago }}</div>
+                    <div>Published By: {{ article.author }}</div>
+                </li>
+            </ul>
+        {% endfor %}
     </div>
 {% endblock %}
 

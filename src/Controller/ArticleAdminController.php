@@ -38,6 +38,10 @@ EOF);
             $article->setPublishedAt(new \DateTime(sprintf('-%d days', random_int(1,100))));
         }
 
+        $article->setAuthor('Marcelo Almeida')
+            ->setHeartCount(random_int(5, 100))
+            ->setImageFilename('asteroids.jpg');
+
         $em->persist($article);
         $em->flush();
 

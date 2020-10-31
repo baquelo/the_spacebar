@@ -6,9 +6,10 @@
     <h1>{{ article.title }}</h1>
 
     <div>
+        <img src="{{ asset(article.imagePath) }}" width="100%" alt="">
         <div>{{ article.publishedAt ? article.publishedAt|ago : 'unpublished' }}</div>
         <div>
-            <span class="js-like-article-count">5</span>
+            <span class="js-like-article-count">{{ article.heartCount }}</span>
             Likes
             <a href="#" class="js-like-article">
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor"
