@@ -4,8 +4,10 @@
 namespace App\Controller;
 
 
+use Michelf\MarkdownInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,7 +25,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}")
      */
-    public function show($slug)
+    public function show($slug, MarkdownInterface $markdown, AdapterInterface $cache)
     {
         $comments = [
             'lorem  ipsulum',
@@ -31,8 +33,31 @@ class ArticleController extends AbstractController
             'lorem  ipsulum',
         ];
 
+        $articleContent = <<<EOF
+ **Lorem ipsum** dolor sit amet, consectetur adipisicing elit. Aperiam assumenda distinctio dolor dolore labore
+            [beef ribs](https://google.com)maxime officia perspiciatis quidem sed voluptate? Debitis et fuga omnis quidem quisquam reprehenderit soluta
+            vitae voluptates.
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid at cumque in nemo nesciunt totam voluptate!
+            Alias beatae est itaque mollitia nam necessitatibus neque rem? Asperiores et laudantium modi neque?
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab accusamus, autem cumque doloremque earum
+            eligendi facere itaque maxime nisi odit quaerat quidem rem rerum suscipit temporibus tenetur veniam
+            voluptate voluptatem.
+EOF;
+
+        $item = $cache->getItem('markdown_'.md5($articleContent));
+        if (!$item->isHit()) {
+            $item->set($markdown->transform($articleContent));
+            $cache->save($item);
+        }
+
+        $articleContent = $item->get();
+
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
+            'articleContent' => $articleContent,
+            'slug' => $slug,
             'comments' => $comments
         ]);
     }
